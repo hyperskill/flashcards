@@ -8,24 +8,34 @@ public class Main {
     private static Scanner scn = new Scanner(System.in);
     private static Map<String, String> cardsMap = new LinkedHashMap<>();
     private static Map<String, Integer> errorsMap = new HashMap<>();
+    private static String exportFileName;
 
     public static void main(String[] args) {
+        if (args.length > 0) {
+            for (int i = 0; i < args.length; i += 2) {
+                switch (args[i]) {
+                    case "-import":
+                        importCmd(args[i + 1]);
+                        break;
+                    case "-export":
+                        exportFileName = args[i + 1];
+                        break;
+                }
+            }
+        } else {
+            System.out.println("The program must have 2 or more args");
+            return;
+        }
         String command = "";
         do {
-            System.out.println("Input the action (add, remove, import, export, ask, exit, log, hardest card, reset stats):");
+            System.out.println("Input the action (add, remove, ask, exit, log, hardest card, reset stats):");
             command = scn.nextLine();
             switch (command) {
-                case "import":
-                    importCmd();
-                    break;
                 case "add":
                     addCmd();
                     break;
                 case "remove":
                     removeCmd();
-                    break;
-                case "export":
-                    exportCmd();
                     break;
                 case "ask":
                     askCmd();
@@ -43,6 +53,7 @@ public class Main {
                     System.out.println(cardsMap);
             }
         } while (!command.equals("exit"));
+        exportCmd();
     }
 
     private static void resetStats() {
@@ -137,9 +148,7 @@ public class Main {
     }
 
     private static void exportCmd() {
-        scn = new Scanner(System.in);
-        System.out.println("File name:");
-        String fileName = scn.nextLine();
+        String fileName = exportFileName;
         File file = new File(fileName);
         try (FileWriter printWriter = new FileWriter(file)) {
             if (!file.exists()) {
@@ -156,10 +165,8 @@ public class Main {
 
     }
 
-    private static void importCmd() {
-        scn = new Scanner(System.in);
-        System.out.println("File name:");
-        String fileName = scn.nextLine();
+    private static void importCmd(String nameFile) {
+        String fileName = nameFile;
         File file = new File(fileName);
         int count = 0;
         try (Scanner scn = new Scanner(file)) {
