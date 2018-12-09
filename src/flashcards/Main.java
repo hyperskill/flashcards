@@ -7,12 +7,13 @@ public class Main {
 
     private static Scanner scn = new Scanner(System.in);
     private static Map<String, String> cardsMap = new LinkedHashMap<>();
+    private static Map<String, Integer> errorsMap = new HashMap<>();
 
     public static void main(String[] args) {
         String command = "";
         do {
-            System.out.println("Input the action (add, remove, import, export, ask, exit):");
-            command = scn.next();
+            System.out.println("Input the action (add, remove, import, export, ask, exit, log, hardest card, reset stats):");
+            command = scn.nextLine();
             switch (command) {
                 case "import":
                     importCmd();
@@ -29,10 +30,69 @@ public class Main {
                 case "ask":
                     askCmd();
                     break;
+                case "log":
+                    log();
+                    break;
+                case "hardest card":
+                    hardestCard();
+                    break;
+                case "reset stats":
+                    resetStats();
+                    break;
                 case "print":
                     System.out.println(cardsMap);
             }
         } while (!command.equals("exit"));
+    }
+
+    private static void resetStats() {
+        errorsMap = new HashMap<>();
+    }
+
+    private static void hardestCard() {
+        scn = new Scanner(System.in);
+        System.out.println("File name:");
+        String fileName = scn.nextLine();
+        File file = new File(fileName);
+        Map<String, Integer> tmpMap = new HashMap<>();
+        try (Scanner scn = new Scanner(file)) {
+            while (scn.hasNextLine()) {
+                tmpMap.put(scn.nextLine(), Integer.parseInt(scn.nextLine()));
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        String hardestCard = "";
+        int errors = 0;
+        int tmpEr = 0;
+        for (Map.Entry<String, Integer> error : tmpMap.entrySet()) {
+            tmpEr = error.getValue();
+            if (errors < tmpEr) {
+                errors = tmpEr;
+                hardestCard = error.getKey();
+            }
+        }
+        System.out.println("The hardest card is " + hardestCard + ". You have " + errors + " errors answering it.");
+    }
+
+    private static void log() {
+        scn = new Scanner(System.in);
+        System.out.println("File name:");
+        String fileName = scn.nextLine();
+        File file = new File(fileName);
+        try (FileWriter printWriter = new FileWriter(file)) {
+            if (!file.exists()) {
+                file.createNewFile();
+            }
+            for (Map.Entry<String, Integer> card : errorsMap.entrySet()) {
+                printWriter.write(card.getKey() + "\n");
+                printWriter.write(card.getValue() + "\n");
+                printWriter.flush();
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        System.out.println("The log has been saved");
     }
 
     private static void askCmd() {
@@ -55,8 +115,20 @@ public class Main {
                                 "you've just written a definition of \"" + secondCard.getKey() + "\" card).");
                     }
                 }
+                if (!errorsMap.containsKey(card.getKey())) {
+                    errorsMap.put(card.getKey(), 1);
+                } else {
+                    int errors = errorsMap.get(card.getKey());
+                    errorsMap.put(card.getKey(), errors + 1);
+                }
             } else {
                 System.out.println("Wrong answer (the correct one is \"" + card.getValue() + "\").");
+                if (!errorsMap.containsKey(card.getKey())) {
+                    errorsMap.put(card.getKey(), 1);
+                } else {
+                    int errors = errorsMap.get(card.getKey());
+                    errorsMap.put(card.getKey(), errors + 1);
+                }
             }
             if (count == i) {
                 break;
