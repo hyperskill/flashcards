@@ -1,33 +1,53 @@
 package flashcards;
 
-import java.util.Scanner;
+import java.util.*;
+
+import static java.lang.System.*;
 
 public class cards {
 
     protected static void cardInput(){
-        Scanner input = new Scanner(System.in);
+        Scanner input = new Scanner(in);
         //ask user for input number of cards
-        System.out.println("Input the number of cards: ");
+        out.println("Input the number of cards: ");
         int numOfCards = input.nextInt();
-        //Array's for storing cards and definitions
-        String[] card = new String[numOfCards];
-        String[] definition = new String[numOfCards];
-        //for loop for getting cards from user and put them in arrays
-        for (int i = 0; i < numOfCards; i++){
-            System.out.println("The card #" + (i + 1) + ": ");
-            card[i] = input.nextLine();
-            System.out.println("The definition of the card #" + (i + 1) + ": ");
-            definition[i] = input.nextLine();
-        }
-        //iterate over cards and ask for answer
-        for (int i = 0; i < card.length; i++){
-            System.out.println("Print the definition of " + card[i] + ": ");
-            String answer = input.nextLine();
-            if (answer.equals(definition[i])){
-                System.out.println("Correct answer.");
+        //HashMap's for storing cards and definitions
+        Map<String, String> cardToDefinition = new HashMap();
+        Map<String, String> definitionToCard = new HashMap();
+        //loop for populating HashMap with values
+        for(int i = 0; i < numOfCards; i++){
+            out.println("The card #" + i +":");
+            String cardValue = input.nextLine();
+            out.println("The definition of the card #" + i +":");
+            String defValue = input.nextLine();
+            if(cardToDefinition.containsKey(cardValue) || definitionToCard.containsKey(defValue)){
+                out.println("Please reenter new value");
+                if (i > 0) {
+                    i--;
+                } else {
+                    i = 0;
+                }
             } else {
-                System.out.println("Wrong answer (the correct one is \"" + definition[i] + "\")");
+                cardToDefinition.put(cardValue, defValue);
+                definitionToCard.put(defValue, cardValue);
             }
         }
+        //loop for answering questions
+        cardToDefinition.forEach((key, value) ->{
+            System.out.println("Print the definition of: " + key);
+            String userAnswer = input.nextLine();
+            if (!value.equals(userAnswer) && definitionToCard.containsKey(userAnswer)){
+                System.out.println("Wrong answer (the correct one is \"" + value +"\", you've just written a definition of \"" + definitionToCard.get(userAnswer) + "\" card). Print the definition of \"" + definitionToCard.get(userAnswer) + "\":");
+                userAnswer = input.nextLine();
+                if (cardToDefinition.containsKey(userAnswer)){
+                    out.println("Correct");
+                } else {
+                    System.out.println(cardToDefinition.get(userAnswer));
+                }
+            } else {
+                System.out.println("Correct");
+            }
+
+        });
     }
 }
