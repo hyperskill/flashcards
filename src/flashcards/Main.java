@@ -14,7 +14,7 @@ public class Main {
         String[] cards = new String[cardAmount];
         String[] definitions = new String[cardAmount];
 
-        while (int i = 1; i <= cardAmount; i++) {
+        for (int i = 1; i <= cardAmount; i++) {
             System.out.println("The card #" + i + ":");
             cards[i-1] = scan.nextLine();
             System.out.println("The definition of the card #" + i + ":");
@@ -23,7 +23,7 @@ public class Main {
 
         String userAnswer;
 
-        while (int j = 0; j < cardAmount; j++) {
+        for (int j = 0; j < cardAmount; j++) {
             System.out.println("Print the definition of \"" + cards[j] + "\":");
             userAnswer = scan.nextLine();
 
