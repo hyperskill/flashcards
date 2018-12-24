@@ -30,7 +30,7 @@ public class Main {
             if (userAnswer != null && userAnswer.equals(definitions[j])) {
                 System.out.print("Correct answer. ");
             } else {
-                System.out.println("Wrong answer (the correct one is \"" + definition[j] + "\").");
+                System.out.println("Wrong answer (the correct one is \"" + definitions[j] + "\").");
             }
         }
     }
