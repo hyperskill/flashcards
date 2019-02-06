@@ -6,7 +6,7 @@ import java.io.IOException;
 import java.util.*;
 
 
-public class flashcards {
+public class Main {
 
 
     private static String userNextLine() {
@@ -38,6 +38,8 @@ public class flashcards {
     private static Map<String, Integer> cardToMistakes = new LinkedHashMap<>();
     private static ArrayList<String> logList = new ArrayList<>();
     private static boolean isEnabled = true;
+    private static boolean needExport = false;
+    private static String exportFileName;
     private static final Scanner scanner = new Scanner(System.in);
     private static Random random = new Random();
 
@@ -64,6 +66,9 @@ public class flashcards {
             case "exit":
                 userPrintln("Bye bye!");
                 isEnabled = false;
+                if (needExport) {
+                    doExport(exportFileName);
+                }
                 break;
             case "log":
                 log();
@@ -247,7 +252,45 @@ public class flashcards {
     }
 
 
+    private static void doImport(String fileName) {
+        File file = new File(fileName);
+        try (Scanner reader = new Scanner(file)) {
+            while (reader.hasNextLine()) {
+                String card = reader.nextLine();
+                String definition = reader.nextLine();
+                String mistakes = reader.nextLine();
+                cardToDefinition.put(card, definition);
+                definitionToCard.put(definition, card);
+                cardToMistakes.put(card, Integer.parseInt(mistakes));
+            }
+        } catch (IOException e) {}
+    }
+
+
+    private static void doExport(String fileName) {
+
+        try (FileWriter writer = new FileWriter(fileName)) {
+            for (Map.Entry<String, String> couple: cardToDefinition.entrySet()) {
+                writer.write(couple.getKey() + "\n");
+                writer.write(couple.getValue() + "\n");
+                writer.write(cardToMistakes.get(couple.getKey()) + "\n");
+            }
+        } catch (IOException e) {}
+    }
+
+
     public static void main(String[] args) {
+
+        if (args.length % 2 == 0) {
+            for (int i = 0; i < args.length; i+=2) {
+                if (args[i].equals("-import")) {
+                    doImport(args[i+1]);
+                } else if (args[i].equals("-export")) {
+                    needExport = true;
+                    exportFileName = args[i+1];
+                }
+            }
+        }
 
         while (isEnabled) {
             chooseAction();
